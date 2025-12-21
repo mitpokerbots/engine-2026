@@ -13,7 +13,7 @@ BIG_BLIND = 2
 SMALL_BLIND = 1
 
 
-class RoundState(namedtuple('_RoundState', ['button', 'street', 'pips', 'stacks', 'hands', 'deck', 'board', 'previous_state'])):
+class RoundState(namedtuple('_RoundState', ['button', 'street', 'pips', 'stacks', 'hands', 'board', 'previous_state'])):
     '''
     Encodes the game tree for one round of poker.
     '''
@@ -21,7 +21,7 @@ class RoundState(namedtuple('_RoundState', ['button', 'street', 'pips', 'stacks'
         '''
         Compares the players' hands and computes payoffs.
         '''
-        return TerminalState([0, 0], None, self)
+        return TerminalState([0, 0], self)
 
     def legal_actions(self):
         '''
@@ -29,8 +29,8 @@ class RoundState(namedtuple('_RoundState', ['button', 'street', 'pips', 'stacks'
         '''
         active = self.button % 2
         continue_cost = self.pips[1-active] - self.pips[active]
-        if self.street in (2,3):
-            return {DiscardAction}
+        if self.street in (2, 3):
+            return {DiscardAction} if active == self.street % 2 else {CheckAction}
         if continue_cost == 0:
             # we can only raise the stakes if both players can afford it
             bets_forbidden = (self.stacks[0] == 0 or self.stacks[1] == 0)
@@ -62,12 +62,17 @@ class RoundState(namedtuple('_RoundState', ['button', 'street', 'pips', 'stacks'
         elif self.street == 0:
             new_street = 2
             button = 0 ### Player A discards first, since they are in position
-            # self.board = self.deck.peek(new_street) fix this logic
+            # self.board.extend(self.deck.peek(new_street))
+        elif self.street == 2 or self.street == 3:
+            new_street = self.street + 1
+            button = 1
         else:
             new_street = self.street + 1
             button = 1
-            # self.board = self.deck.peek(new_street) fix this logic
-        return RoundState(button, new_street, [0, 0], self.stacks, self.hands, self.deck, self.board, self)
+            # self.board.append(self.deck.peek(new_street - 1)[new_street - 2])
+
+        return RoundState(button, new_street, [0, 0], self.stacks, self.hands, self.board, self)
+
 
     def proceed(self, action):
         '''
@@ -96,41 +101,33 @@ class RoundState(namedtuple('_RoundState', ['button', 'street', 'pips', 'stacks'
         '''
         active = self.button % 2
         if isinstance(action, DiscardAction):
-            if active == 0:
-                action_card = self.index_card(0, action.card)
-                self.hands[0].remove(action_card)###How to index in pkrbot
-                self.board.push(action_card)
-                state = RoundState(1, self.street, self.pips, self.stacks, self.hands, self.deck, self.board, self)
-                return state.proceed_street()
-            else:
-                action_card = self.index_card(1, action.card)
-                self.hands[1].remove(action_card)
-                self.board.push(action_card)
-                state = RoundState(0, self.street, self.pips, self.stacks, self.hands, self.deck, self.board, self)
-                return state.proceed_street()
+            if len(self.hands[active]) != 0:
+                self.board.append(self.hands[active].pop(action.card))
+            state = RoundState((1 - active) % 2, self.street, self.pips, self.stacks, self.hands, self.board, self)
+            return state
         if isinstance(action, FoldAction):
             delta = self.stacks[0] - STARTING_STACK if active == 0 else STARTING_STACK - self.stacks[1]
             return TerminalState([delta, -delta], self)
         if isinstance(action, CallAction):
             if self.button == 0:  # sb calls bb
-                return RoundState(1, 0, [BIG_BLIND] * 2, [STARTING_STACK - BIG_BLIND] * 2, self.hands, self.deck, self.board,self)
+                return RoundState(1, 0, [BIG_BLIND] * 2, [STARTING_STACK - BIG_BLIND] * 2, self.hands, self.board,self)
             # both players acted
             new_pips = list(self.pips)
             new_stacks = list(self.stacks)
             contribution = new_pips[1-active] - new_pips[active]
             new_stacks[active] -= contribution
             new_pips[active] += contribution
-            state = RoundState(self.button + 1, self.street, new_pips, new_stacks, self.hands, self.deck, self.board, self)
+            state = RoundState(self.button + 1, self.street, new_pips, new_stacks, self.hands, self.board, self)
             return state.proceed_street()
         if isinstance(action, CheckAction):
-            if (self.street == 0 and self.button > 0) or self.button > 1:  # both players acted
+            if (self.street == 0 and self.button > 0) or self.button > 1 or self.street == 2 or self.street == 3:  # both players acted
                 return self.proceed_street()
             # let opponent act
-            return RoundState(self.button + 1, self.street, self.pips, self.stacks, self.hands, self.deck, self.board, self)
+            return RoundState(self.button + 1, self.street, self.pips, self.stacks, self.hands, self.board, self)
         # isinstance(action, RaiseAction)
         new_pips = list(self.pips)
         new_stacks = list(self.stacks)
         contribution = action.amount - new_pips[active]
         new_stacks[active] -= contribution
         new_pips[active] += contribution
-        return RoundState(self.button + 1, self.street, new_pips, new_stacks, self.hands, self.deck, self.board, self)
+        return RoundState(self.button + 1, self.street, new_pips, new_stacks, self.hands, self.board, self)

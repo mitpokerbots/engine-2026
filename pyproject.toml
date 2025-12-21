@@ -7,5 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "cython>=3.2.1",
     "eval7>=0.1.10",
+    "pkrbot>=1.0.1",
     "setuptools>=80.9.0",
 ]

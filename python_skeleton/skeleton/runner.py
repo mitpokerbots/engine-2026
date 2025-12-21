@@ -60,16 +60,16 @@ class Runner():
                 elif clause[0] == 'P':
                     active = int(float(clause[1:]))
                 elif clause[0] == 'H':
-                    hands = [[], [], []]
+                    hands = [[], []]
 
                     hands[active] = clause[1:].split(',')
                     pips = [SMALL_BLIND, BIG_BLIND]
                     stacks = [STARTING_STACK - SMALL_BLIND, STARTING_STACK - BIG_BLIND]
-                    round_state = RoundState(0, 0, pips, stacks, hands, None, [], None)
+                    round_state = RoundState(0, 0, pips, stacks, hands, [], None)
                 elif clause[0] == 'G':
                     # 'G' clause indicates game/round start - just update the round_state without changing values
                     round_state = RoundState(round_state.button, round_state.street, round_state.pips, round_state.stacks,
-                                             round_state.hands, round_state.deck, round_state.board, round_state.previous_state)
+                                             round_state.hands, round_state.board, round_state.previous_state)
                     if round_flag:
                         self.pokerbot.handle_new_round(game_state, round_state, active)
                         round_flag = False
@@ -92,7 +92,7 @@ class Runner():
                     # Just update the board with the cards from the engine
                     board_cards = clause[1:].split(',') if len(clause) > 1 else []
                     round_state = RoundState(round_state.button, round_state.street, round_state.pips, round_state.stacks,
-                                             round_state.hands, round_state.deck, board_cards, round_state.previous_state)
+                                             round_state.hands, board_cards, round_state.previous_state)
                 elif clause[0] == 'O':
                     # backtrack
                     round_state = round_state.previous_state
@@ -100,8 +100,8 @@ class Runner():
                     revised_hands[1-active] = clause[1:].split(',')
                     # rebuild history
                     round_state = RoundState(round_state.button, round_state.street, round_state.pips, round_state.stacks,
-                                             revised_hands, round_state.deck, round_state.board, round_state.previous_state)
-                    round_state = TerminalState([0, 0], None, round_state)
+                                             revised_hands, round_state.board, round_state.previous_state)
+                    round_state = TerminalState([0, 0], round_state)
                 elif clause[0] == 'A':
                     assert isinstance(round_state, TerminalState)
                     delta = int(float(clause[1:]))
