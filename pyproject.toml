@@ -6,6 +6,5 @@ readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "cython>=3.2.3",
-    "eval7>=0.1.10",
     "pkrbot>=1.1.0",
 ]
