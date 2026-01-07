@@ -10,7 +10,7 @@ import math
 import json
 import subprocess
 import socket
-import pkrbot ###import eval7, but better
+import eval7 ###temporarily switch from pkrbot to eval7
 import sys
 import os
 import random
@@ -108,8 +108,8 @@ class RoundState(namedtuple('_RoundState', ['button', 'street', 'pips', 'stacks'
             This method assumes both players have equal stacks when reaching showdown,
             which is enforced by an assertion.
         '''
-        score0 = pkrbot.evaluate(self.board + self.hands[0])
-        score1 = pkrbot.evaluate(self.board + self.hands[1])
+        score0 = eval7.evaluate(self.board + self.hands[0])
+        score1 = eval7.evaluate(self.board + self.hands[1])
         assert(self.stacks[0] == self.stacks[1])
         if score0 > score1:
             delta = self.get_delta(0)
@@ -527,7 +527,7 @@ class Game():
         '''
         Runs one round of poker.
         '''
-        deck = pkrbot.Deck()
+        deck = eval7.Deck()
         deck.shuffle()
         hands = [deck.deal(3), deck.deal(3)]
         board = []
