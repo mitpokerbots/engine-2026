@@ -1,5 +1,5 @@
 '''
-Simple example pokerbot, written in Python.
+Not-So-Simple example pokerbot, written in Python.
 '''
 from skeleton.actions import FoldAction, CallAction, CheckAction, RaiseAction, DiscardAction
 from skeleton.states import GameState, TerminalState, RoundState
