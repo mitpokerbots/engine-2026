@@ -93,8 +93,8 @@ public class Runner {
                                 Arrays.asList(
                                         new ArrayList<String>(),
                                         new ArrayList<String>()));
-                        hands.set(active, Arrays.asList(cards[0], cards[1]));
-                        hands.set(1 - active, Arrays.asList("", ""));
+                        hands.set(active, Arrays.asList(cards[0], cards[1], cards[2]));
+                        hands.set(1 - active, Collections.emptyList());
                         List<String> deck = new ArrayList<String>(Arrays.asList("", "", "", "", ""));
                         List<Integer> pips = Arrays.asList(State.SMALL_BLIND, State.BIG_BLIND);
                         List<Integer> stacks = Arrays.asList(State.STARTING_STACK - State.SMALL_BLIND,
