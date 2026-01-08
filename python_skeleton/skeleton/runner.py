@@ -109,7 +109,7 @@ class Runner():
                     deltas[active] = delta
                     round_state = TerminalState(deltas, round_state.previous_state)
                     self.pokerbot.handle_round_over(game_state, round_state, active)
-                    game_state = GameState(game_state.bankroll + delta, game_state.game_clock, game_state.round_num)
+                    game_state = GameState(game_state.bankroll + delta, game_state.game_clock, game_state.round_num + 1)
                     round_flag = True
                 elif clause[0] == 'Q':
                     return
