@@ -1,5 +1,5 @@
 '''
-Henry's pokerbot
+None RL pokerbot
 '''
 from skeleton.actions import FoldAction, CallAction, CheckAction, RaiseAction, DiscardAction
 from skeleton.states import GameState, TerminalState, RoundState
