@@ -149,8 +149,10 @@ namespace pokerbots::skeleton {
             roundState = std::make_shared<TerminalState>(
               std::move(deltas), std::static_pointer_cast<const TerminalState>(roundState)
               ->previousState);
+            pokerbot.handleRoundOver(gameInfo, std::static_pointer_cast<const TerminalState>(roundState), active);
             gameInfo = std::make_shared<GameInfo>(
-              gameInfo->bankroll + delta, gameInfo->gameClock, gameInfo->roundNum);
+              gameInfo->bankroll + delta, gameInfo->gameClock, gameInfo->roundNum + 1);
+            roundFlag = true;
             break;
           }
           case 'Q': {
