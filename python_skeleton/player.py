@@ -81,7 +81,8 @@ class Player(Bot):
         Your action.
         '''
         legal_actions = round_state.legal_actions()  # the actions you are allowed to take
-        # 0, 3, 4, or 5 representing pre-flop, flop, turn, or river respectively
+        # 0, 2, 3, 4, 5, 6 representing pre-flop, bb discard, sb discard, post
+        # discard flop betting, and then turn and river
         street = round_state.street
         my_cards = round_state.hands[active]  # your cards
         board_cards = round_state.board  # the board cards

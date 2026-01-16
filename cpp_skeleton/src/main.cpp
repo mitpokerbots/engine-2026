@@ -36,7 +36,7 @@ struct Bot {
     int active) {
     int myDelta = terminalState->deltas[active];  // your bankroll change from this round 
     auto previousState = std::static_pointer_cast<const RoundState>(terminalState->previousState);  // RoundState before payoffs
-    int street = previousState->street;  // 0, 3, 4, or 5 representing when this round ended 
+    int street = previousState->street;  // 0, 2, 3, 4, 5, or 6 representing when this round ended 
     auto myCards = previousState->hands[active];  // your cards 
     auto oppCards = previousState->hands[1 - active];  // opponent's cards or "" if not revealed 
   }
@@ -54,7 +54,7 @@ struct Bot {
     int active) {
     auto legalActions =
       roundState->legalActions(); // the actions you are allowed to take
-    int street = roundState->street;  // 0, 3, 4, or 5 representing pre-flop, flop, turn, or river respectively
+    int street = roundState->street;  // 0, 2, 3, 4, 5, or 6 representing pre-flop, bb discard, sb discard, flop, turn, and river respectively
     auto myCards = roundState->hands[active];  // your cards 
     auto boardCards = roundState->board;  // the board cards 
     int myPip = roundState->pips[active];  // the number of chips you have contributed to the pot this round of betting 
